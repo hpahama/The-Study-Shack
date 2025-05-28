@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Study Shack</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      font-family: 'Fira Code', monospace;
+      background-color: #0e0e10;
+      color: #e5e5e5;
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      background-color: #1a1a1d;
+      width: 260px;
+      padding: 20px;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .sidebar h1 {
+      font-size: 18px;
+      color: #FF9515;
+      margin-bottom: 12px;
+    }
+
+    .channel {
+      padding: 10px 14px;
+      border-radius: 6px;
+      color: #ccc;
+      background-color: transparent;
+      transition: 0.2s;
+      text-decoration: none;
+      display: block;
+      cursor: pointer;
+    }
+
+    .channel:hover {
+      background-color: #333;
+      color: #61dafb;
+    }
+
+    .main {
+      flex: 1;
+      padding: 40px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .main h2 {
+      color: #74C365;
+      font-size: 18px;
+      margin-top: 0;
+    }
+
+    .card {
+      background-color: #1f1f23;
+      padding: 24px;
+      border-radius: 10px;
+      margin-bottom: 40px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      transition: transform 0.2s ease;
+      display: none; /* hide all cards by default */
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow-y: auto;
+    }
+
+      .card.active {
+        display: block !important;
+        position: relative !important;
+        margin-bottom: 0 !important;
+        height: auto !important;
+      }
+
+    .card:hover {
+      transform: scale(1.01);
+    }
+
+    a {
+      color: #ff6f61;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    code {
+      background-color: #2d2d2d;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.95em;
+      color: #ffad5c;
+    }
+
+    /* --- MOBILE ONLY STYLES --- */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+        height: auto;
+        overflow: auto;
+      }
+
+      /* Hide full sidebar */
+      .sidebar {
+        display: none;
+      }
+
+      /* Mobile header */
+      .mobile-header {
+        width: 100%;
+        padding: 10px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        background-color: #1a1a1d;
+        z-index: 1000;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+      }
+
+      .mobile-header h1 {
+        font-size: 18px;
+        margin: 0;
+        color: #FF9515;
+      }
+
+      .hamburger {
+        font-size: 24px;
+        background: none;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        margin-right: 25px;
+      }
+
+      .mobile-links {
+        display: none;
+        flex-direction: column;
+        background-color: #1a1a1d;
+        padding: 10px 16px;
+        border-top: 1px solid #333;
+      }
+
+      .mobile-links a {
+        padding: 10px;
+        margin-bottom: 6px;
+        border-radius: 6px;
+        font-size: 14px;
+        background-color: #121214;
+        cursor: pointer;
+      }
+
+      .main {
+        padding: 20px 16px;
+        padding-top: 20px;
+        overflow-y: visible;
+        height: auto;
+        position: relative;
+      }
+
+      .card {
+        padding: 18px;
+        margin-bottom: 30px;
+        position: relative !important;
+        display: none !important;
+      }
+
+      .card.active {
+        display: block !important;
+        position: relative !important;
+        margin-bottom: 0 !important;
+        height: auto !important;
+      }
+
+      .main h2 {
+        font-size: 16px;
+      }
+    }
+
+    /* --- DESKTOP ONLY --- */
+    @media (min-width: 769px) {
+      .mobile-header, .mobile-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MOBILE HEADER -->
+  <div class="mobile-header">
+    <h1>📚 The Study Shack</h1>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </div>
+
+  <!-- MOBILE NAV LINKS -->
+  <div class="mobile-links" id="mobileLinks">
+    <a class="channel" data-target="guest-handbook" onclick="showCard(event)"># guest-handbook</a>
+    <a class="channel" data-target="the-guide" onclick="showCard(event)"># the-guide</a>
+    <a class="channel" data-target="about-the-mods" onclick="showCard(event)"># about-the-mods</a>
+    <a class="channel" data-target="study-sesh" onclick="showCard(event)"># study-sesh</a>
+  </div>
+
+  <!-- DESKTOP SIDEBAR -->
+  <div class="sidebar">
+    <h1>📚 The Study Shack</h1>
+    <a class="channel" data-target="guest-handbook" onclick="showCard(event)"># guest-handbook</a>
+    <a class="channel" data-target="the-guide" onclick="showCard(event)"># the-guide</a>
+    <a class="channel" data-target="about-the-mods" onclick="showCard(event)"># about-the-mods</a>
+    <a class="channel" data-target="study-sesh" onclick="showCard(event)"># study-sesh</a>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="card active" id="guest-handbook">
+      <h2>The Laws of the Realm 📜</h2>
+      <ul>
+        <li><strong style="color: #F89F5B;">1. Honor Thy Fellow Travelers</strong><br>All who tread these halls shall be treated with dignity and kindness. Let respect be the foundation upon which our fellowship is built.</li>
+
+        <li><strong style="color: #F89F5B;">2. Speak With Purpose</strong><br>Let not thy words be lost to clutter and chaos. Avoid needless repetition, excessive noise, and unwarranted summons of thy brethren.</li>
+
+        <li><strong style="color: #F89F5B;">3. The Artisan’s Rightful Share</strong><br>Those who craft and create may share their works, but seek not coin nor barter within these sacred halls. Beware the peddling of wares, the posting of shadowed links, or the lure of distant domains.</li>
+
+        <li><strong style="color: #F89F5B;">4. Obey the Guardians</strong><br>The great barrier was forged for the good of all—circumvent it at thy peril, lest silence be laid upon thee.</li>
+
+        <li><strong style="color: #F89F5B;">5. Let Thy Words Be Just</strong><br>Discourse must remain noble and true, free of ill intent and wandering tongues that sow discord.</li>
+
+        <li><strong style="color: #F89F5B;">6. The Shadows Shall Not Enter</strong><br>Matters of depravity and obscenity have no place here. Keep thy thoughts and deeds free from such darkness.</li>
+
+        <li><strong style="color: #F89F5B;">7. Bear a Name Befitting the Realm</strong><br>Should thy name bring dishonor or distress, thou shalt be asked to alter it. Should the offense repeat, exile shall be swift and without reprieve.</li>
+
+        <li><strong style="color: #F89F5B;">8. The Realm's Harmonies Must Remain Unspoiled</strong><br>Melodies may carry the tales of hardship and revelry, yet they shall not speak in slurs or bring forth words unfit for noble ears.</li>
+
+        <li><strong style="color: #F89F5B;">9. The Guardians Hold Final Judgment</strong><br>The keepers of order shall speak, and their word shall be law. Stray not beyond their counsel, nor presume upon freedoms unwritten.</li>
+      </ul>
+
+      <p><strong style="color: #F89F5B;">⚖️ Judgment of the Council:</strong> No banishment nor great penalty shall be decided lightly. Each matter shall be weighed with care and fairness.</p>
+    </div>
+
+    <div class="card" id="the-guide">
+      <h2>The Study Shack Guide 🌿</h2>
+      <ul>
+        <li>🌸 <strong>Channels:</strong> Each channel has a unique focus.</li>
+        <li>🌸 <strong>Pomodoro:</strong> Find study playlists on <a href="https://open.spotify.com/user/studyshack" target="_blank" rel="noopener noreferrer">Spotify</a> and other platforms.</li>
+        <li>🌸 <strong>Self-Care:</strong> Visit the <code>#self-care</code> channel for wellness tips.</li>
+        <li>🌸 <strong>Events:</strong> Keep an eye on the <code>#events</code> board for study sessions and socials.</li>
+        <li>🌸 <strong>Rules:</strong> Always follow the <code>#guest-handbook</code>!</li>
+      </ul>
+    </div>
+
+    <div class="card" id="about-the-mods">
+      <h2>Meet the Mods ✨</h2>
+      <ul>
+        <li><strong>Raven:</strong> The strategist keeping chaos at bay with a kind heart.</li>
+        <li><strong>Jules:</strong> The music lover making every session a vibe.</li>
+        <li><strong>Morgan:</strong> The night owl moderator ready to support and guide.</li>
+      </ul>
+    </div>
+
+    <div class="card" id="study-sesh">
+      <h2>Study Sesh Tips 📝</h2>
+      <ul>
+        <li>💡 Break down big tasks into smaller, manageable chunks.</li>
+      <li>💡 Use the Pomodoro technique: 25 minutes work, 5 minutes rest.</li>
+      <li>💡 Minimize distractions: silence notifications and create a dedicated space.</li>
+      <li>💡 Stay hydrated and take short movement breaks.</li>
+      </ul>
+    </div>
+  </div>
+
+<script>
+  function toggleMenu() {
+    const menu = document.getElementById('mobileLinks');
+    if (menu.style.display === 'flex') {
+      menu.style.display = 'none';
+    } else {
+      menu.style.display = 'flex';
+    }
+  }
+
+  function showCard(event) {
+    event.preventDefault();
+    // hide mobile menu if open
+    const menu = document.getElementById('mobileLinks');
+    if (menu.style.display === 'flex') {
+      menu.style.display = 'none';
+    }
+    
+    // get target id from clicked link
+    const target = event.currentTarget.getAttribute('data-target');
+    if (!target) return;
+
+    // hide all cards
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => card.classList.remove('active'));
+
+    // show the selected card
+    const activeCard = document.getElementById(target);
+    if (activeCard) activeCard.classList.add('active');
+  }
+
+  // On page load, make sure the home card is shown (guest-handbook)
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => card.classList.remove('active'));
+    const home = document.getElementById('guest-handbook');
+    if (home) home.classList.add('active');
+  });
+</script>
+
+</body>
+</html>
